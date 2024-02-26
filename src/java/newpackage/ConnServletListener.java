@@ -46,13 +46,13 @@ public class ConnServletListener implements ServletContextListener {
             tcp_socket = new Socket(TCP_SERVER_IP,TCP_SERVER_PORT);
             System.out.println("Connected to server");
             
-            //
-            PrintWriter tcp_out_socket = new PrintWriter(
-				new OutputStreamWriter(tcp_socket.getOutputStream())
-				);
-            
+     ///////Mo Salah note : added the BufferedWriter tcp_out_socket in the TcpServlet
+//            BufferedWriter tcp_out_socket = new BufferedWriter(
+//				new OutputStreamWriter(tcp_socket.getOutputStream())
+//				);
+//            
             servletContext.setAttribute("tcp_socket", tcp_socket);
-            servletContext.setAttribute("tcp_out_socket", tcp_out_socket);
+//            servletContext.setAttribute("tcp_out_socket", tcp_out_socket);
          /////////////////////
          
          ////////////////////

@@ -8,7 +8,9 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.Socket;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -25,6 +27,9 @@ import javax.servlet.http.Part;
 @MultipartConfig
 public class TcpServlet extends HttpServlet {
 
+    
+    Socket tcp_socket;
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -38,8 +43,15 @@ public class TcpServlet extends HttpServlet {
             throws ServletException, IOException {
         
         ServletContext servletContext = getServletContext();
+        tcp_socket = (Socket) servletContext.getAttribute("tcp_socket");
 //        BufferedReader in_socket = (BufferedReader) servletContext.getAttribute("in_socket");
-        PrintWriter out_socket = (PrintWriter) servletContext.getAttribute("tcp_out_socket");
+        
+
+        ////////Mo Salah note : removed BufferedWriter tcp_out_socket intialization from the ConnServletListener context/////////// 
+        BufferedWriter tcp_out_socket = new BufferedWriter(
+				new OutputStreamWriter(tcp_socket.getOutputStream())
+				);
+//        BufferedWriter out_socket = (BufferedWriter) servletContext.getAttribute("tcp_out_socket");
         String dataToSend = request.getParameter("msg");
         
         //file
@@ -48,10 +60,11 @@ public class TcpServlet extends HttpServlet {
 //        InputStream fileContent = filePart.getInputStream();
         //
         
-        if (out_socket != null) {
+        if (tcp_out_socket != null) {
             // Send data to the server
-            out_socket.println(dataToSend);
-            out_socket.flush();
+            tcp_out_socket.write(dataToSend);
+            tcp_out_socket.newLine();
+            tcp_out_socket.flush();
             
             //file
 //            byte[] buffer = new byte[(int) filePart.getSize()]; 
