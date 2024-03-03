@@ -5,9 +5,13 @@
 package newpackage;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
@@ -19,10 +23,9 @@ import javax.servlet.http.Part;
  *
  * @author mohamed
  */
-
 //https://docs.oracle.com/javaee/7/api/javax/servlet/annotation/MultipartConfig.html
 @MultipartConfig
-public class FilterServlet extends HttpServlet {
+public class FilterUploadServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -35,19 +38,20 @@ public class FilterServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       
+
         /*
         //https://stackoverflow.com/questions/1748259/get-form-parameters-from-multipart-request-without-getting-the-files
 
-        */
-
+         */
 //https://docs.oracle.com/javaee/7/api/javax/servlet/http/Part.html        
         Part optionPart = request.getPart("option");
-        
+
         String option = null;
         BufferedReader reader = new BufferedReader(new InputStreamReader(optionPart.getInputStream()));
         option = reader.readLine();
-        
+
+        File file = saveSubmittedFileToPath(request);
+        request.setAttribute("SavedFile", file);
         
         if (option != null && option.equals("udp")) {
             request.getRequestDispatcher("/UdpServlet").forward(request, response);
@@ -57,6 +61,28 @@ public class FilterServlet extends HttpServlet {
             // Handle invalid option
             // You may want to display an error message or redirect to a default servlet
         }
+    }
+
+    private File saveSubmittedFileToPath(HttpServletRequest request) throws ServletException {
+        try {
+            Part filePart = request.getPart("file");
+            // get current app path
+            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+            String appPath = request.getServletContext().getRealPath("");
+            //create Directory
+            String pathToSave = appPath + "UploadsFile" + File.separator;
+            File dir = new File(pathToSave);
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+            pathToSave += fileName;
+            File file = new File(pathToSave);
+            filePart.write(pathToSave);         //save file to get absolute path to get file content
+            return file;
+        } catch (IOException ex) {
+            Logger.getLogger(FilterUploadServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

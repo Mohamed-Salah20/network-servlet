@@ -6,7 +6,7 @@
     </listener>
     <servlet>
         <servlet-name>FilterServlet</servlet-name>
-        <servlet-class>newpackage.FilterServlet</servlet-class>
+        <servlet-class>newpackage.FilterUploadServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>UdpServlet</servlet-name>

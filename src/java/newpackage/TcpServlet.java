@@ -6,8 +6,11 @@ package newpackage;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -23,13 +26,11 @@ import javax.servlet.http.Part;
  *
  * @author mohamed
  */
-
 @MultipartConfig
 public class TcpServlet extends HttpServlet {
 
-    
     Socket tcp_socket;
-    
+    Socket tcp_file_socket;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -41,40 +42,59 @@ public class TcpServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         ServletContext servletContext = getServletContext();
         tcp_socket = (Socket) servletContext.getAttribute("tcp_socket");
-//        BufferedReader in_socket = (BufferedReader) servletContext.getAttribute("in_socket");
-        
+        tcp_file_socket = (Socket) servletContext.getAttribute("file_socket");
 
+        //------------------------Kirollos----------------------------
+        File file = (File) request.getAttribute("SavedFile");
+        FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
+        long fileSize = file.length();
+
+        ObjectOutputStream out = new ObjectOutputStream(tcp_file_socket.getOutputStream());
+        out.writeUTF(file.getName()); //sending file name
+        out.writeLong(fileSize); //sending file size to check connection
+        out.flush();
+
+        System.out.println("File sent successfully");
+
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+
+        while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+            out.write(buffer, 0, bytesRead);    //sending file data
+            out.flush();
+        }
+
+        //----------------------------------------------------
         ////////Mo Salah note : removed BufferedWriter tcp_out_socket intialization from the ConnServletListener context/////////// 
         BufferedWriter tcp_out_socket = new BufferedWriter(
-				new OutputStreamWriter(tcp_socket.getOutputStream())
-				);
+                new OutputStreamWriter(tcp_socket.getOutputStream())
+        );
 //        BufferedWriter out_socket = (BufferedWriter) servletContext.getAttribute("tcp_out_socket");
         String dataToSend = request.getParameter("msg");
-        
+
         //file
 //        Part filePart = request.getPart("file");
 //        String fileName = filePart.getSubmittedFileName();
 //        InputStream fileContent = filePart.getInputStream();
         //
-        
         if (tcp_out_socket != null) {
             // Send data to the server
             tcp_out_socket.write(dataToSend);
             tcp_out_socket.newLine();
             tcp_out_socket.flush();
-            
+
             //file
 //            byte[] buffer = new byte[(int) filePart.getSize()]; 
 //            out_socket.write(buffer, 0, buffer.length);
 //            
 //            out_socket.flush();
         }
-        
+
         response.sendRedirect("index.html");
-        
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

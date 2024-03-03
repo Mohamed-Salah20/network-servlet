@@ -4,12 +4,7 @@
  */
 package newpackage;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +23,13 @@ public class ConnServletListener implements ServletContextListener {
     String TCP_SERVER_IP = "localhost";
     int TCP_SERVER_PORT = 3456;
     Socket tcp_socket;
+    
+    //
+    
+    //TCP_File
+    int TCP_FILE_PORT = 3457;
+    Socket tcp_file_socket;
+    
     //
     
     //udp:
@@ -44,6 +46,8 @@ public class ConnServletListener implements ServletContextListener {
           ////////////////////
             //tcp:
             tcp_socket = new Socket(TCP_SERVER_IP,TCP_SERVER_PORT);
+            tcp_file_socket = new Socket(TCP_SERVER_IP, TCP_FILE_PORT);
+            
             System.out.println("Connected to server");
             
      ///////Mo Salah note : added the BufferedWriter tcp_out_socket in the TcpServlet
@@ -52,6 +56,7 @@ public class ConnServletListener implements ServletContextListener {
 //				);
 //            
             servletContext.setAttribute("tcp_socket", tcp_socket);
+            servletContext.setAttribute("file_socket", tcp_file_socket);
 //            servletContext.setAttribute("tcp_out_socket", tcp_out_socket);
          /////////////////////
          
