@@ -42,11 +42,23 @@ public class ConnServletListener implements ServletContextListener {
     
         ServletContext servletContext = sce.getServletContext();
 
+//        try {
+//            Socket mysocket = new Socket(TCP_SERVER_IP,TCP_SERVER_PORT);
+//        } catch (IOException ex) {
+//            Logger.getLogger(ConnServletListener.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         try {
-          ////////////////////
+            ////////////////////
             //tcp:
             tcp_socket = new Socket(TCP_SERVER_IP,TCP_SERVER_PORT);
+        } catch (IOException ex) {
+            System.out.println("tcp msg server is down");
+        }
+        try {
             tcp_file_socket = new Socket(TCP_SERVER_IP, TCP_FILE_PORT);
+        } catch (IOException ex) {
+           System.out.println("tcp file server is down");
+        }
             
             System.out.println("Connected to server");
             
@@ -70,9 +82,6 @@ public class ConnServletListener implements ServletContextListener {
          ////////////////////   
          
          
-        } catch (IOException ex) {
-            Logger.getLogger(ConnServletListener.class.getName()).log(Level.SEVERE, null, ex);
-        }
         
     
     }
