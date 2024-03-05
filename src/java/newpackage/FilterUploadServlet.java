@@ -49,10 +49,11 @@ public class FilterUploadServlet extends HttpServlet {
         String option = null;
         BufferedReader reader = new BufferedReader(new InputStreamReader(optionPart.getInputStream()));
         option = reader.readLine();
+        if (!request.getPart("file").getSubmittedFileName().isEmpty()) {
+            File file = saveSubmittedFileToPath(request);
+            request.setAttribute("SavedFile", file);
+        }
 
-        File file = saveSubmittedFileToPath(request);
-        request.setAttribute("SavedFile", file);
-        
         if (option != null && option.equals("udp")) {
             request.getRequestDispatcher("/UdpServlet").forward(request, response);
         } else if (option != null && option.equals("tcp")) {
